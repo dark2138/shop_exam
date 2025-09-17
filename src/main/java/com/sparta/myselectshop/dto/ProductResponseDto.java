@@ -27,7 +27,7 @@ public class ProductResponseDto {
         this.image = product.getImage();
         this.lprice = product.getLprice();
         this.myprice = product.getMyprice();
-        this.productFolderList = product.getProductFolders().stream()
+        this.productFolderList = product.getProductFolderList().stream()
                 .map(ProductFolder::getFolder)
                 .map(FolderResponseDto::new)
                 .collect(Collectors.toList());
