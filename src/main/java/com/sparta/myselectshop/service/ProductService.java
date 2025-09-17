@@ -10,6 +10,7 @@ import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.sparta.myselectshop.naver.dto.ItemDto;
 
 @Service
 @RequiredArgsConstructor
@@ -47,4 +48,9 @@ public class ProductService {
         return productRepository.findAll().stream().map(ProductResponseDto::new).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateBySearch(Long id, ItemDto itemDto) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new NullPointerException("상품을 찾을 수 없습니다."));
+        product.updateByItemDto(itemDto);
+    }
 }
