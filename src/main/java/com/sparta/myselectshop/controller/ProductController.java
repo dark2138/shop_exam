@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.sparta.myselectshop.security.UserDetailsImpl;
+import org.springframework.data.domain.Page;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -36,13 +37,25 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<ProductResponseDto> getProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return productService.getProducts(userDetails.getUser());
+    public Page<ProductResponseDto> getProducts(
+        @RequestParam(required = false, name = "page") int page,
+        @RequestParam(required = false, name = "size") int size,
+        @RequestParam(required = false, name = "sortBy") String sortBy,
+        @RequestParam(required = false, name = "isAsc") boolean isAsc,
+    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+
+        return productService.getProducts(userDetails.getUser(), page-1, size, sortBy, isAsc);
     }
 
 
     @GetMapping("/admin/products")
-    public List<ProductResponseDto> getAdminProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return productService.getAdminProducts();
+    public Page<ProductResponseDto> getAdminProducts(
+            @RequestParam(required = false, name = "page") int page,
+            @RequestParam(required = false, name = "size") int size,
+            @RequestParam(required = false, name = "sortBy") String sortBy,
+            @RequestParam(required = false, name = "isAsc") boolean isAsc,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getProducts(userDetails.getUser(), page-1, size, sortBy, isAsc);
     }
 }
