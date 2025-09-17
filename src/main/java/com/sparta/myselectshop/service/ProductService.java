@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.sparta.myselectshop.naver.dto.ItemDto;
+import com.sparta.myselectshop.entity.User;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,8 @@ public class ProductService {
 
     public static final int MIN_MYPRICE = 100;
 
-    public ProductResponseDto createProduct(ProductRequestDto requestDto) {
-        Product product = new Product(requestDto);
+    public ProductResponseDto createProduct(ProductRequestDto requestDto, User user) {
+        Product product = new Product(requestDto, user);
         productRepository.save(product);
         return new ProductResponseDto(product);
     }
@@ -44,13 +45,18 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponseDto> getProducts() {
-        return productRepository.findAll().stream().map(ProductResponseDto::new).collect(Collectors.toList());
+    public List<ProductResponseDto> getProducts(User user) {
+        return productRepository.findAllByUser(user).stream().map(ProductResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
     public void updateBySearch(Long id, ItemDto itemDto) {
         Product product = productRepository.findById(id).orElseThrow(() -> new NullPointerException("상품을 찾을 수 없습니다."));
         product.updateByItemDto(itemDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getAdminProducts() {
+        return productRepository.findAll().stream().map(ProductResponseDto::new).collect(Collectors.toList());
     }
 }

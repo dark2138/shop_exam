@@ -1,6 +1,7 @@
 package com.sparta.myselectshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.sparta.myselectshop.security.UserDetailsImpl;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -21,9 +24,10 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/products")
-    public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto) {
+    public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
 
-        return productService.createProduct(requestDto);
+        return productService.createProduct(requestDto, userDetails.getUser());
     }
 
     @PutMapping("/products/{id}")
@@ -32,7 +36,13 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<ProductResponseDto> getProducts() {
-        return productService.getProducts();
+    public List<ProductResponseDto> getProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getProducts(userDetails.getUser());
+    }
+
+
+    @GetMapping("/admin/products")
+    public List<ProductResponseDto> getAdminProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getAdminProducts();
     }
 }
