@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.service.ProductService;
-
+import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -20,5 +22,10 @@ public class ProductController {
     public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto) {
 
         return productService.createProduct(requestDto);
+    }
+
+    @PutMapping("/products/{id}")
+    public ProductResponseDto updateProduct(@PathVariable Long id, @RequestBody ProductMypriceRequestDto requestDto) {
+        return productService.updateProduct(id, requestDto);
     }
 }
