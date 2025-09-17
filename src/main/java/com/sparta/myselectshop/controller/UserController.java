@@ -67,7 +67,7 @@ public class UserController {
         return new UserInfoDto(username, isAdmin);
     }
 
-    @GetMapping("/user/folders")
+    @GetMapping("/user-folder")
     public String getUserFolders(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<FolderResponseDto> folders = folderService.getUserFolders(userDetails.getUser());
         model.addAttribute("folders", folders);

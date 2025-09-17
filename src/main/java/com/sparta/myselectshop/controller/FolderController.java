@@ -9,7 +9,11 @@ import com.sparta.myselectshop.dto.FolderRequestDto;
 import com.sparta.myselectshop.service.FolderService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.sparta.myselectshop.security.UserDetailsImpl;
+
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import com.sparta.myselectshop.dto.FolderResponseDto;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -19,10 +23,15 @@ public class FolderController {
 
     @PostMapping("/folders")
     public void createFolder(@RequestBody FolderRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-List<String> folderNames = requestDto.getFolderNames();
-folderService.createFolder(folderNames, userDetails.getUser());
+        List<String> folderNames = requestDto.getFolderNames();
+        folderService.createFolder(folderNames, userDetails.getUser());
 
 
-        
+    }
+
+
+    @GetMapping("/folders")
+    public List<FolderResponseDto> getFolders(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return folderService.getUserFolders(userDetails.getUser());
     }
 }
