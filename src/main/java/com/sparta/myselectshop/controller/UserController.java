@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.ui.Model;
+import com.sparta.myselectshop.service.FolderService;
+import com.sparta.myselectshop.dto.FolderResponseDto;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +28,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final FolderService folderService;
 
     @GetMapping("/user/login-page")
     public String loginPage() {
@@ -62,5 +65,12 @@ public class UserController {
         boolean isAdmin = (role == UserRoleEnum.ADMIN);
 
         return new UserInfoDto(username, isAdmin);
+    }
+
+    @GetMapping("/user/folders")
+    public String getUserFolders(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<FolderResponseDto> folders = folderService.getUserFolders(userDetails.getUser());
+        model.addAttribute("folders", folders);
+        return "index :: #fragment";
     }
 }
