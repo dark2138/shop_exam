@@ -8,6 +8,7 @@ import com.sparta.myselectshop.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,13 @@ import org.springframework.ui.Model;
 import com.sparta.myselectshop.service.FolderService;
 import com.sparta.myselectshop.dto.FolderResponseDto;
 import java.util.List;
+import com.sparta.myselectshop.service.KakaoService;
+import jakarta.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.sparta.myselectshop.jwt.JwtUtil;
+import jakarta.servlet.http.Cookie;
+
 
 @Slf4j
 @Controller
@@ -29,9 +37,17 @@ public class UserController {
 
     private final UserService userService;
     private final FolderService folderService;
+    private final KakaoService kakaoService;
+
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
 
     @GetMapping("/user/login-page")
-    public String loginPage() {
+    public String loginPage(Model model) {
+        // 카카오 로그인 URL 생성
+        String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + kakaoClientId + 
+                              "&redirect_uri=http://localhost:8090/api/user/kakao/callback&response_type=code";
+        model.addAttribute("kakaoLoginUrl", kakaoLoginUrl);
         return "login";
     }
 
@@ -72,5 +88,17 @@ public class UserController {
         List<FolderResponseDto> folders = folderService.getUserFolders(userDetails.getUser());
         model.addAttribute("folders", folders);
         return "index :: #fragment";
+    }
+
+    @GetMapping("/user/kakao/callback")
+    public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        String token = kakaoService.kakaoLogin(code);
+       
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return "redirect:/";
+
     }
 }
