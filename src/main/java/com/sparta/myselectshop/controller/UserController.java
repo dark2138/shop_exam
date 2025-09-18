@@ -42,11 +42,18 @@ public class UserController {
     @Value("${kakao.client.id}")
     private String kakaoClientId;
 
+    @Value("${kakao.client.redirect-uri}")
+    private String kakaoRedirectUri;
+
+    @Value("${server.base-url}")
+    private String serverBaseUrl;
+
     @GetMapping("/user/login-page")
     public String loginPage(Model model) {
         // 카카오 로그인 URL 생성
+        String fullRedirectUri = serverBaseUrl + kakaoRedirectUri;
         String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + kakaoClientId + 
-                              "&redirect_uri=http://localhost:8090/api/user/kakao/callback&response_type=code";
+                              "&redirect_uri=" + fullRedirectUri + "&response_type=code";
         model.addAttribute("kakaoLoginUrl", kakaoLoginUrl);
         return "login";
     }
@@ -94,7 +101,7 @@ public class UserController {
     public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         String token = kakaoService.kakaoLogin(code);
        
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token);
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
         cookie.setPath("/");
         response.addCookie(cookie);
 
