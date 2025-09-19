@@ -27,7 +27,9 @@ import com.sparta.myselectshop.entity.ProductFolder;
 import java.util.Optional;
 
 import com.sparta.myselectshop.repository.ProductFolderRepository;
-
+import org.springframework.context.MessageSource;
+import java.util.Locale;
+import com.sparta.myselectshop.exception.ProductNotFoundException;
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -36,6 +38,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FolderRepository folderRepository;
     private final ProductFolderRepository productFolderRepository;
+
+    private final MessageSource messageSource;
 
     public static final int MIN_MY_PRICE = 100;
 
@@ -51,10 +55,24 @@ public class ProductService {
         int myprice = requestDto.getMyprice();
 
         if (myprice < MIN_MY_PRICE) {
-            throw new IllegalArgumentException("유효하지 않은 최저가 입니다. 최소 최저가는 " + MIN_MY_PRICE + "원 이상으로 설정해주세요.");
+            throw new IllegalArgumentException(
+                messageSource.getMessage(
+                    "below.min.my.price"
+                    , new Integer[] {MIN_MY_PRICE}
+                    , "WRONG_MIN_MY_PRICE"
+                    , Locale.getDefault()
+                    )
+            );
         }
 
-        Product product = productRepository.findById(id).orElseThrow(() -> new NullPointerException("상품을 찾을 수 없습니다."));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(
+            messageSource.getMessage(
+                "not.found.product", 
+                null,
+                "NOT_FOUND_PRODUCT",
+                 Locale.getDefault()
+                 )
+        ));
 
         product.update(requestDto);
 
