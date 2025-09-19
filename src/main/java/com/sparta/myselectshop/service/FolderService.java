@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.myselectshop.repository.FolderRepository;
 import com.sparta.myselectshop.entity.Folder;
 import com.sparta.myselectshop.entity.User;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+
 import com.sparta.myselectshop.dto.FolderResponseDto;
 
 @Service
@@ -30,7 +32,7 @@ public class FolderService {
                 Folder folder = new Folder(folderName, user);
                 newFolders.add(folder);
             } else {
-                throw new IllegalArgumentException("중복된 폴더명입니다.");
+                throw new IllegalArgumentException("중복된 폴더명을 제거해주세요! 폴더명 : " + folderName + " 입니다.");
             }
         }
 
@@ -45,9 +47,8 @@ public class FolderService {
     }
 
 
-
     private boolean isExistingFolderName(List<Folder> existingFolders, String folderName) {
         return existingFolders.stream().anyMatch(folder -> folder.getName().equals(folderName));
     }
-    
+
 }
